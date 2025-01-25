@@ -34,7 +34,7 @@ let cur_cunk = 1;
 
 
 let draw = (x, y) => {
-  ctx.drawImage(images[0], x -8, y + 70, 50, 110);
+  ctx.drawImage(images[0], x -8, y + 10, 50, 110);
 
 };
 let drawSideWayTree = (x, y) => {
@@ -48,37 +48,41 @@ let x_offset_of_ligtning;
 function drawSkier(ctx, x, y, rotation) {
   const radians = (rotation + 90) * -1 * (Math.PI / 180);
   distance_between_skiis_x = (90 - Math.abs(rotation)) / 6
-  distance_between_skiis_y = (rotation) / 9;
-  x_offset_of_ligtning = 10 + rotation / 11.25
+  distance_between_skiis_y = (rotation) / 15;
+  x_offset_of_ligtning = 10 + rotation / 11.25;
   ctx.save();
   ctx.translate(x, y);
   ctx.save();
   ctx.rotate(radians);
-  ctx.fillStyle = "brown";
+  ctx.fillStyle = "black";
 
-  ctx.fillRect(-35 + distance_between_skiis_y * -1, 0, 30, 5);
-  ctx.fillRect(-35 + distance_between_skiis_y, distance_between_skiis_x, 30, 5);
+  ctx.fillRect(-35 + distance_between_skiis_y , 0, 30, 5);
+  ctx.fillRect(-35 + distance_between_skiis_y * -1, distance_between_skiis_x, 30, 5);
   ctx.restore();
   // Малюємо тулуб
-  ctx.fillStyle = "yellow";
+  ctx.fillStyle = "#b3030f";
   ctx.fillRect(0, -5, 20, 25);
 
-  ctx.fillStyle = "black";
+  ctx.fillStyle = "#f5f0ec";
   ctx.fillRect(x_offset_of_ligtning, -5, 2, 22);
-  // Малюємо голову (напівколо)
+
   ctx.beginPath();
   ctx.fillStyle = "#d8cf89"; // Колір повного кола
   ctx.arc(10, -10, 10, 0, Math.PI * 2, true); // Повне коло (360°)
   ctx.fill();
   ctx.closePath();
   ctx.beginPath();
-  ctx.fillStyle = "black"; // Колір напівкруга
-  ctx.arc(10, -10, 10, 0, Math.PI, true); // Напівкруг (180°)
+  ctx.fillStyle = "#b3030f"; 
+  ctx.arc(10, -10, 10, 0, Math.PI, true); 
   ctx.fill();
   ctx.closePath();
-  ctx.fillStyle = "black"; // Колір напівкруга
-
+  ctx.beginPath();
+  ctx.fillStyle = "#f5f0ec"; 
+  ctx.arc(10, -20,3 , 0, Math.PI*2, true); 
+  ctx.fill();
+  ctx.closePath();
   ctx.restore();
+
 
 
 
@@ -104,7 +108,7 @@ function drawtrees(trees, player_y) {
 function drawShadow(trees, player_y) {
   trees.forEach((tree) => {
     if (tree.x > width * 0.2 && tree.x < width * 0.8)
-      ctx.fillRect(tree.x - 8, tree.y - player_y + 170, 45, 60);
+      ctx.fillRect(tree.x - 8, tree.y - player_y + 110, 45, 60);
     else {
       ctx.fillRect(tree.x - 20, tree.y - player_y + 150, 70, 150);
     }
