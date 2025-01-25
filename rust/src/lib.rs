@@ -59,6 +59,7 @@ impl Game {
         self.current_chunk=1;
         self.game_over= false;
         self.rotation=0;
+        self.traces= vec![];
     }
 
 
@@ -89,7 +90,7 @@ impl Game {
         }
     
         // Оновлюємо відповідний чанк
-        match num_of_current_chunk {
+        match (num_of_current_chunk+1)%3 {
             0 => self.trees_chunk1 = chunk_trees,
             1 => self.trees_chunk2 = chunk_trees,
             2 => self.trees_chunk3 = chunk_trees,
@@ -154,6 +155,7 @@ impl Game {
                 Reflect::set(&tree_obj, &"y".into(), &JsValue::from_f64(tree.1)).unwrap();
                 all_trees.push(&tree_obj);
             }
+            
         // Додаємо дерева з chunk2, якщо поточний чанк 1 або 2
             for tree in &self.trees_chunk2 {
                 let tree_obj = Object::new();
@@ -161,6 +163,7 @@ impl Game {
                 Reflect::set(&tree_obj, &"y".into(), &JsValue::from_f64(tree.1)).unwrap();
                 all_trees.push(&tree_obj);
             }
+        
         // Додаємо дерева з chunk3, якщо поточний чанк 2 або 3
             for tree in &self.trees_chunk3 {
                 let tree_obj = Object::new();
@@ -168,7 +171,6 @@ impl Game {
                 Reflect::set(&tree_obj, &"y".into(), &JsValue::from_f64(tree.1)).unwrap();
                 all_trees.push(&tree_obj);
             }
-    
         all_trees.into()
     }
 
