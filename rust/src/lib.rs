@@ -92,6 +92,9 @@ impl Game {
         self.rotation = rotation_degree;
         self.acceleration = (90 - self.rotation.abs()) as f64 ;
     }
+    pub fn change_tree_spawn_per_chunk(&mut self, new_tree_spawn_per_chunk: u8) {
+        self.tree_spawn_per_chunk = new_tree_spawn_per_chunk;
+    }
 
     pub fn btn_change_rotation(&mut self, amount: i8) {
         let new_rotation = self.rotation + amount;
