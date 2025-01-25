@@ -5,9 +5,9 @@ const canvas = document.getElementById("gameCanvas");
 let wrapper = document.getElementById("wrapper")
 function resizeCanvas() {
   if (window.innerWidth < 450) {
-    wrapper.style.width = "100vw"; // Робимо ширину обгортки рівною ширині екрана
-    canvas.width = window.innerWidth; // Встановлюємо ширину канваса
-    canvas.height = window.innerHeight * 0.9; // Встановлюємо висоту канваса (90% від висоти вікна)
+    wrapper.style.width = "100vw";
+    canvas.width = window.innerWidth; 
+    canvas.height = window.innerHeight * 0.9; 
   }
   else {
     wrapper.style.width = "fit-content";
@@ -30,9 +30,11 @@ sideWayTree.src = "./SideWayTree.png";
 img.src = "./tree.png";
 let images = [img, sideWayTree];
 let game;
+let cur_cunk = 1;
+
 
 let draw = (x, y) => {
-  ctx.drawImage(images[0], x - 10, y + 70, 50, 110);
+  ctx.drawImage(images[0], x -8, y + 70, 50, 110);
 
 };
 let drawSideWayTree = (x, y) => {
@@ -81,7 +83,7 @@ function drawSkier(ctx, x, y, rotation) {
 
 
 }
-function drawtrees(trees,player_y) {
+function drawtrees(trees, player_y) {
   let regularTrees = [];
   let sideWayTrees = [];
   trees.sort((a, b) => a.y - b.y).forEach((tree) => {
@@ -99,10 +101,10 @@ function drawtrees(trees,player_y) {
   });
 }
 
-function drawShadow(trees,player_y){
+function drawShadow(trees, player_y) {
   trees.forEach((tree) => {
     if (tree.x > width * 0.2 && tree.x < width * 0.8)
-      ctx.fillRect(tree.x - 15, tree.y - player_y + 150, 45, 60);
+      ctx.fillRect(tree.x - 8, tree.y - player_y + 170, 45, 60);
     else {
       ctx.fillRect(tree.x - 20, tree.y - player_y + 150, 70, 150);
     }
@@ -156,11 +158,14 @@ function drawTraces(player_y) {
   ctx.lineWidth = 4;
   ctx.stroke();
 }
+let mode = Math.floor(width/50)
 
 async function run() {
   try {
     await init();
-    game = Game.new(height, width, 15);
+    game = Game.new(height, width, mode);
+    cur_cunk = 0;
+    let trees = game.get_all_trees_for_js();
 
     function map(value, canvasWidth) {
       const minRotation = -50;
@@ -171,7 +176,6 @@ async function run() {
         Math.min(maxRotation, normalizedValue * maxRotation)
       );
     }
-
     function startAction(key, direction) {
       if (intervals.has(key)) return;
 
@@ -184,14 +188,12 @@ async function run() {
 
       intervals.set(key, interval);
     }
-
     function stopAction(key) {
       if (intervals.has(key)) {
         clearInterval(intervals.get(key));
         intervals.delete(key);
       }
     }
-
     window.addEventListener("keydown", (event) => {
       const key = event.key;
       if (!pressedKeys.has(key)) {
@@ -223,27 +225,32 @@ async function run() {
 
       game.change_player_rotation(rotation);
     });
-
     restartBtn.addEventListener("click", () => {
       game.restart();
       gameLoop();
     });
 
     function gameLoop() {
+      const req_cur_chunk =game.get_current_chunk();
+      if ( req_cur_chunk!== cur_cunk) {
+        trees = game.get_all_trees_for_js(); 
+        cur_cunk=req_cur_chunk;
+      }
+
       try {
         game.update();
         if (game.get_is_game_over()) {
           return;
         }
         let player_y = game.get_player_y();
-        const trees = game.get_all_trees_for_js();
+
         ctx.fillStyle = "#95b1df";
         ctx.clearRect(0, 0, width, height);
-        drawShadow(trees,player_y)
+        drawShadow(trees, player_y)
         drawTraces(player_y);
-        
+
         drawSkier(ctx, game.get_player_x(), height * 0.2, game.get_player_rotation());
-        drawtrees(trees,player_y)
+        drawtrees(trees, player_y)
         scoreDisplay.textContent =
           "Score: " + Math.floor(game.get_player_y());
 

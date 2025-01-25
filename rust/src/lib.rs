@@ -63,32 +63,29 @@ impl Game {
 
 
 
-    pub fn generate_chunk(&mut self, num_of_chunk_to_change: u8) {
+    pub fn generate_chunk(&mut self, num_of_current_chunk : u8) {
         let mut chunk_trees = Vec::new(); 
-        let current_chunk = (self.player_y / self.height as f64).floor() ;
-        let y_start = (current_chunk + 1.0) * self.height as f64;
-        let y_end = y_start + self.height as f64;
+        let num_of_chunk_to_change = (num_of_current_chunk +1) % 3 +1;
+        let y_start = (num_of_current_chunk + 1) as f64 * self.height ;
+        let y_end = y_start + self.height  as f64;
         
-        self.traces.retain(|trace| trace.1 < self.player_y - 200.0);
+        self.traces.retain(|trace| trace.1 < self.player_y - self.width*0.5);
 
 
-        // Генеруємо дерева в межах діапазону
         for _ in 0..self.tree_spawn_per_chunk {
-            let x = rand::random::<f64>() * self.width as f64; // X в межах ширини
-            let y = rand::random::<f64>() * (y_end - y_start) + y_start; // Y в межах висоти
+            let x = rand::random::<f64>() * self.width as f64; 
+            let y = rand::random::<f64>() * (y_end - y_start) + y_start; 
             chunk_trees.push((x, y)); 
         }
 
         for _ in 0..3 {
-            // Ліва межа (10 дерев)
             let x_left = rand::random::<f64>() * 30.0; 
             let y_left = rand::random::<f64>() * (y_end - y_start) + y_start; 
             chunk_trees.push((x_left, y_left));
         
-            // Права межа (10 дерев)
             let x_right = self.width - 30.0 + rand::random::<f64>() * 30.0; 
             let y_right = rand::random::<f64>() * (y_end - y_start) + y_start; 
-            chunk_trees.push((x_right, y_right)); // Додаємо дерево до списку
+            chunk_trees.push((x_right, y_right)); 
         }
         
         // Змінюємо відповідний чанк
@@ -96,7 +93,7 @@ impl Game {
             1 => self.trees_chunk1 = chunk_trees,
             2 => self.trees_chunk2 = chunk_trees, 
             3 => self.trees_chunk3 = chunk_trees, 
-            _ => {}, // Ігноруємо, якщо номер чанка некоректний
+            _ => {},
         }
     }
 
@@ -135,30 +132,37 @@ impl Game {
     
     pub fn get_all_trees_for_js(&self) -> JsValue {
         let all_trees = Array::new();
-
-        // Додаємо дерева з chunk1
-        for tree in &self.trees_chunk1 {
-            let tree_obj = Object::new();
-            Reflect::set(&tree_obj, &"x".into(), &JsValue::from_f64(tree.0)).unwrap();
-            Reflect::set(&tree_obj, &"y".into(), &JsValue::from_f64(tree.1)).unwrap();
-            all_trees.push(&tree_obj);
+    
+        // Додаємо дерева з chunk1, якщо поточний чанк 2 або 3
+        if self.current_chunk == 2 || self.current_chunk == 3 {
+            for tree in &self.trees_chunk1 {
+                let tree_obj = Object::new();
+                Reflect::set(&tree_obj, &"x".into(), &JsValue::from_f64(tree.0)).unwrap();
+                Reflect::set(&tree_obj, &"y".into(), &JsValue::from_f64(tree.1)).unwrap();
+                all_trees.push(&tree_obj);
+            }
         }
-        
-        // Додаємо дерева з chunk2
-        for tree in &self.trees_chunk2 {
-            let tree_obj = Object::new();
-            Reflect::set(&tree_obj, &"x".into(), &JsValue::from_f64(tree.0)).unwrap();
-            Reflect::set(&tree_obj, &"y".into(), &JsValue::from_f64(tree.1)).unwrap();
-            all_trees.push(&tree_obj);
+    
+        // Додаємо дерева з chunk2, якщо поточний чанк 1 або 2
+        if self.current_chunk == 1 || self.current_chunk == 2 {
+            for tree in &self.trees_chunk2 {
+                let tree_obj = Object::new();
+                Reflect::set(&tree_obj, &"x".into(), &JsValue::from_f64(tree.0)).unwrap();
+                Reflect::set(&tree_obj, &"y".into(), &JsValue::from_f64(tree.1)).unwrap();
+                all_trees.push(&tree_obj);
+            }
         }
-
-        for tree in &self.trees_chunk3 {
-            let tree_obj = Object::new();
-            Reflect::set(&tree_obj, &"x".into(), &JsValue::from_f64(tree.0)).unwrap();
-            Reflect::set(&tree_obj, &"y".into(), &JsValue::from_f64(tree.1)).unwrap();
-            all_trees.push(&tree_obj);
+    
+        // Додаємо дерева з chunk3, якщо поточний чанк 2 або 3
+        if self.current_chunk == 2 || self.current_chunk == 3 {
+            for tree in &self.trees_chunk3 {
+                let tree_obj = Object::new();
+                Reflect::set(&tree_obj, &"x".into(), &JsValue::from_f64(tree.0)).unwrap();
+                Reflect::set(&tree_obj, &"y".into(), &JsValue::from_f64(tree.1)).unwrap();
+                all_trees.push(&tree_obj);
+            }
         }
-
+    
         all_trees.into()
     }
 
@@ -180,11 +184,13 @@ impl Game {
     }
 
     pub fn update(&mut self) {
-        let chunk = (self.player_y / self.height) as u8 % 3;
-        if self.current_chunk != chunk {
-            self.generate_chunk((chunk+1)%3); 
-            self.current_chunk = chunk;
+        let num_of_current_chunk = (self.player_y /self.height) as u8; 
+        let cur_chunk_being_rendered =num_of_current_chunk%3;
+        if self.current_chunk != cur_chunk_being_rendered {
+            self.generate_chunk(num_of_current_chunk); 
+            self.current_chunk = cur_chunk_being_rendered;
         }
+
         self.traces.push((self.player_x, self.player_y));
         self.move_player();
     }
@@ -197,7 +203,7 @@ impl Game {
         for tree in trees {
             let distance = ((self.player_x - tree.0).powi(2) + (self.player_y - tree.1).powi(2)).sqrt();
             let player_radius =10.0;
-            let tree_radius = 9.0;
+            let tree_radius = 12.0;
             if distance < player_radius + tree_radius {
                 return true; 
             }
@@ -220,4 +226,8 @@ impl Game {
     pub fn get_player_rotation(&self) -> i8 {
         self.rotation
     }
+    pub fn get_current_chunk(&self) -> u8 {
+        self.current_chunk
+    }
+
 }
