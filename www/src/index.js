@@ -140,7 +140,7 @@ async function run() {
     });
 
     restartBtn.addEventListener("click", () => {
-      game = Game.restart();
+      game.restart();
       gameLoop();
     });
        
@@ -157,7 +157,7 @@ async function run() {
         ctx.clearRect(0, 0, width, height);
         trees.forEach((tree) => {
           if (tree.x > width*0.2 && tree.x < width*0.8)
-            ctx.fillRect(tree.x - 15, tree.y - player_y + 130, 45, 60);
+            ctx.fillRect(tree.x - 15, tree.y - player_y + 140, 45, 60);
           else {
             ctx.fillRect(tree.x -20, tree.y - player_y + 140, 70, 150);
           }
