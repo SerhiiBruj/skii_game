@@ -32,12 +32,11 @@ let images = [img, sideWayTree];
 let game;
 
 let draw = (x, y) => {
-  ctx.drawImage(images[0], x - 17, y+65, 50, 110);
+  ctx.drawImage(images[0], x - 20, y+60, 50, 110);
 };
 let drawSideWayTree = (x, y) => {
   ctx.drawImage(images[1], x - 50, y -70, 100, 250);
 };
-
 
 function drawSkier(ctx, x, y, rotation) {
 const radians = (rotation + 90)*-1 * (Math.PI / 180); 
@@ -77,7 +76,6 @@ async function run() {
   try {
     await init(); 
     game = Game.new(height ,width , 15);
-    game.begin(); 
 
     function map(value, canvasWidth) {
       const minRotation = -50;
@@ -141,6 +139,11 @@ async function run() {
       game.change_player_rotation(rotation);
     });
 
+    restartBtn.addEventListener("click", () => {
+      game = Game.restart();
+      gameLoop();
+    });
+       
     function gameLoop() {
       try {
         game.update();
@@ -209,9 +212,3 @@ async function run() {
 
 run();
 
-restartBtn.addEventListener("click", () => {
-  game = Game.new(height,width , 3);
-  game.begin();
-  gameLoop();
-});
-   

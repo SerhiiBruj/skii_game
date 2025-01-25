@@ -34,7 +34,7 @@ impl Game {
     pub fn new(height: f64, width: f64, tree_spawn_per_chunk: u8) -> Game {
         Game {
             player_x: width / 2.0,
-            player_y: height * 0.1,
+            player_y: 0.0,
             acceleration: 0.0,
             rotation: 0,
             width,
@@ -48,8 +48,20 @@ impl Game {
             tree_spawn_per_chunk,
         }
     }
-    pub fn begin(&mut self){
+
+    pub fn restart(&mut self){
+        self.player_x= self.width / 2.0;
+        self.player_y= 0.0;
+        self.acceleration = 0.0;
+        self.trees_chunk1= vec![];
+        self.trees_chunk2= vec![];
+        self.trees_chunk3= vec![];
+        self.current_chunk=1;
+        self.game_over= false;
+        self.rotation=0;
     }
+
+
 
     pub fn generate_chunk(&mut self, num_of_chunk_to_change: u8) {
         let mut chunk_trees = Vec::new(); 
