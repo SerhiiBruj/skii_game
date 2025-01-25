@@ -197,7 +197,7 @@ impl Game {
         for tree in trees {
             let distance = ((self.player_x - tree.0).powi(2) + (self.player_y - tree.1).powi(2)).sqrt();
             let player_radius =10.0;
-            let tree_radius = 7.0;
+            let tree_radius = 9.0;
             if distance < player_radius + tree_radius {
                 return true; 
             }
