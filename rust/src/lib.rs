@@ -148,32 +148,26 @@ impl Game {
         let all_trees = Array::new();
     
         // Додаємо дерева з chunk1, якщо поточний чанк 2 або 3
-        if self.current_chunk == 1 || self.current_chunk == 3 {
             for tree in &self.trees_chunk1 {
                 let tree_obj = Object::new();
                 Reflect::set(&tree_obj, &"x".into(), &JsValue::from_f64(tree.0)).unwrap();
                 Reflect::set(&tree_obj, &"y".into(), &JsValue::from_f64(tree.1)).unwrap();
                 all_trees.push(&tree_obj);
             }
-        }
         // Додаємо дерева з chunk2, якщо поточний чанк 1 або 2
-        if self.current_chunk == 2 || self.current_chunk == 1 {
             for tree in &self.trees_chunk2 {
                 let tree_obj = Object::new();
                 Reflect::set(&tree_obj, &"x".into(), &JsValue::from_f64(tree.0)).unwrap();
                 Reflect::set(&tree_obj, &"y".into(), &JsValue::from_f64(tree.1)).unwrap();
                 all_trees.push(&tree_obj);
             }
-        }
         // Додаємо дерева з chunk3, якщо поточний чанк 2 або 3
-        if self.current_chunk == 3 || self.current_chunk == 2 {
             for tree in &self.trees_chunk3 {
                 let tree_obj = Object::new();
                 Reflect::set(&tree_obj, &"x".into(), &JsValue::from_f64(tree.0)).unwrap();
                 Reflect::set(&tree_obj, &"y".into(), &JsValue::from_f64(tree.1)).unwrap();
                 all_trees.push(&tree_obj);
             }
-        }
     
         all_trees.into()
     }
