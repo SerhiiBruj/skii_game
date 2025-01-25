@@ -32,10 +32,10 @@ let images = [img, sideWayTree];
 let game;
 
 let draw = (x, y) => {
-  ctx.drawImage(images[0], x - 20, y+60, 50, 110);
+  ctx.drawImage(images[0], x - 20, y+65, 50, 110);
 };
 let drawSideWayTree = (x, y) => {
-  ctx.drawImage(images[1], x - 50, y -70, 100, 250);
+  ctx.drawImage(images[1], x - 45, y -70, 100, 250);
 };
 
 function drawSkier(ctx, x, y, rotation) {
