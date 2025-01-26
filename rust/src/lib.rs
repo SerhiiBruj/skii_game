@@ -66,7 +66,7 @@ impl Game {
 
     pub fn generate_chunk(&mut self, num_of_current_chunk : u8) {
         let mut chunk_trees = Vec::new(); 
-        let y_start = ((num_of_current_chunk + 1) as f64) * self.height;
+        let y_start = ((num_of_current_chunk + 2) as f64) * self.height;
         let y_end = y_start + self.height as f64;
     
         self.traces.retain(|trace| trace.1 < self.player_y - 200.0);
@@ -90,7 +90,7 @@ impl Game {
         }
     
         // Оновлюємо відповідний чанк
-        match (num_of_current_chunk+1)%3 {
+        match (num_of_current_chunk + 1 )%3 {
             0 => self.trees_chunk1 = chunk_trees,
             1 => self.trees_chunk2 = chunk_trees,
             2 => self.trees_chunk3 = chunk_trees,
@@ -134,7 +134,7 @@ impl Game {
     
     pub fn update(&mut self) {
         let num_of_current_chunk = (self.player_y /self.height) as u8; 
-        let cur_chunk_being_rendered =num_of_current_chunk%3 +1;
+        let cur_chunk_being_rendered =num_of_current_chunk % 3;
         if self.current_chunk != cur_chunk_being_rendered {
             self.generate_chunk(num_of_current_chunk); 
             self.current_chunk = cur_chunk_being_rendered;
@@ -148,39 +148,35 @@ impl Game {
     pub fn get_all_trees_for_js(&self) -> JsValue {
         let all_trees = Array::new();
     
-        // Додаємо дерева з chunk1, якщо поточний чанк 2 або 3
+    
             for tree in &self.trees_chunk1 {
                 let tree_obj = Object::new();
                 Reflect::set(&tree_obj, &"x".into(), &JsValue::from_f64(tree.0)).unwrap();
                 Reflect::set(&tree_obj, &"y".into(), &JsValue::from_f64(tree.1)).unwrap();
                 all_trees.push(&tree_obj);
             }
-            
-        // Додаємо дерева з chunk2, якщо поточний чанк 1 або 2
+    
             for tree in &self.trees_chunk2 {
                 let tree_obj = Object::new();
                 Reflect::set(&tree_obj, &"x".into(), &JsValue::from_f64(tree.0)).unwrap();
                 Reflect::set(&tree_obj, &"y".into(), &JsValue::from_f64(tree.1)).unwrap();
                 all_trees.push(&tree_obj);
             }
-        
-        // Додаємо дерева з chunk3, якщо поточний чанк 2 або 3
+    
             for tree in &self.trees_chunk3 {
                 let tree_obj = Object::new();
                 Reflect::set(&tree_obj, &"x".into(), &JsValue::from_f64(tree.0)).unwrap();
                 Reflect::set(&tree_obj, &"y".into(), &JsValue::from_f64(tree.1)).unwrap();
                 all_trees.push(&tree_obj);
             }
+    
         all_trees.into()
     }
-
-    
 
 
     pub fn get_all_traces_for_js(&self) -> JsValue {
         let all_traces = Array::new();
 
-        // Фільтруємо сліди за умовою
         for trace in &self.traces {
             if trace.1 >= self.player_y - self.height * 0.2 {
                 let trace_obj = Object::new();
