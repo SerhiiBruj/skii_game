@@ -3,11 +3,15 @@ import init, { Game } from "rust";
 
 const canvas = document.getElementById("gameCanvas");
 let wrapper = document.getElementById("wrapper")
+let gameOverSign = document.getElementById("gameOverSign")
+
 function resizeCanvas() {
   if (window.innerWidth < 450) {
     wrapper.style.width = "100vw";
     canvas.width = window.innerWidth; 
-    canvas.height = window.innerHeight * 0.9; 
+    canvas.height = window.innerHeight;
+    wrapper.style.borderRadius=0; 
+    document.body.style.overflowY="hidden";
   }
   else {
     wrapper.style.width = "fit-content";
@@ -34,11 +38,11 @@ let cur_cunk = 1;
 
 
 let draw = (x, y) => {
-  ctx.drawImage(images[0], x -8, y + 10, 50, 110);
+  ctx.drawImage(images[0], x-10, y + 10, 50, 110);
 
 };
 let drawSideWayTree = (x, y) => {
-  ctx.drawImage(images[1], x - 45, y - 70, 100, 250);
+  ctx.drawImage(images[1], x - 45, y - 108, 100, 250);
 
 };
 
@@ -56,8 +60,8 @@ function drawSkier(ctx, x, y, rotation) {
   ctx.rotate(radians);
   ctx.fillStyle = "black";
 
-  ctx.fillRect(-35 + distance_between_skiis_y , 0, 30, 5);
-  ctx.fillRect(-35 + distance_between_skiis_y * -1, distance_between_skiis_x, 30, 5);
+  ctx.fillRect(-35 + distance_between_skiis_y , 2, 30, 4);
+  ctx.fillRect(-35 + distance_between_skiis_y * -1, distance_between_skiis_x, 30, 4);
   ctx.restore();
   // Малюємо тулуб
   ctx.fillStyle = "#b3030f";
@@ -110,7 +114,7 @@ function drawShadow(trees, player_y) {
     if (tree.x > width * 0.2 && tree.x < width * 0.8)
       ctx.fillRect(tree.x - 8, tree.y - player_y + 110, 45, 60);
     else {
-      ctx.fillRect(tree.x - 20, tree.y - player_y + 150, 70, 150);
+      ctx.fillRect(tree.x - 20, tree.y - player_y + 120, 70, 150);
     }
   });
 }
@@ -170,7 +174,6 @@ async function run() {
     game = Game.new(height, width, mode);
     cur_cunk = 0;
     let trees = game.get_all_trees_for_js();
-
     function map(value, canvasWidth) {
       const minRotation = -50;
       const maxRotation = 50;
@@ -230,6 +233,7 @@ async function run() {
       game.change_player_rotation(rotation);
     });
     restartBtn.addEventListener("click", () => {
+      gameOverSign.style.display="none";
       game.restart();
       gameLoop();
     });
@@ -245,6 +249,7 @@ async function run() {
       try {
         game.update();
         if (game.get_is_game_over()) {
+          gameOverSign.style.display="flex";
           return;
         }
 
@@ -253,8 +258,9 @@ async function run() {
         drawShadow(trees, player_y)
         drawTraces(player_y);
 
-        drawSkier(ctx, game.get_player_x(), height * 0.2, game.get_player_rotation());
+        drawSkier(ctx, game.get_player_x(), height * 0.2 , game.get_player_rotation());
         drawtrees(trees, player_y)
+
         scoreDisplay.textContent =
           "Score: " + Math.floor(game.get_player_y());
 
@@ -263,7 +269,7 @@ async function run() {
         console.error("Error during game loop:", error);
       }
     }
-    console.log(game.get_player_x())
+
     gameLoop();
   } catch (error) {
     console.error(error);

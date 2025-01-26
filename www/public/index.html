@@ -3,47 +3,28 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <title>Ski Game</title>
-    <style>
-      body {
-        background-color: rgb(46, 46, 46);
-        flex-direction: column;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-      .wrapper {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        overflow: hidden;
-        border-radius: 10%;
-        background-color: aliceblue;
-      }
-      * {
-        color: aliceblue;
-        font-size: larger;
-        font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
-      }
-      #restart{
-        border-radius: 30%;
-        color: lightblue;
-        background-color: gray;
-        border:solid lightblue 5px;
-        padding: 20px;
-        position: absolute;
-        top: 5%;
-        left:5%  ;
-      }
-    </style>
+    <link rel="stylesheet" href="./styles.css">
   <body>
-    <button id="restart">Restart</button>
+
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap');
+      * {
+  font-family: "Pixelify Sans", serif;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: normal;
+}
+    </style>
+    <div id="gameOverSign">
+      <button id="restart">Restart</button>
+    </div>
 
     <div id="wrapper" class="wrapper">
       <canvas id="gameCanvas" ></canvas>
     </div>
     <p id="score">Score: 0</p>
-    <br />
 
 
 
