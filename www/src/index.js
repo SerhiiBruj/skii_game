@@ -172,7 +172,8 @@ async function run() {
   try {
     await init();
     game = Game.new(height, width, mode);
-    cur_cunk = 0;
+    game.generate_chunk(0)
+    cur_cunk = 10;
     let trees = game.get_all_trees_for_js();
     function map(value, canvasWidth) {
       const minRotation = -50;
@@ -241,7 +242,7 @@ async function run() {
     function gameLoop() {
       let player_y = game.get_player_y();
       const req_cur_chunk =game.get_current_chunk();
-      if ( req_cur_chunk!== cur_cunk) {
+      if ( req_cur_chunk!== cur_cunk && player_y % height> height*0.5) {
         trees = game.get_all_trees_for_js(); 
         cur_cunk=req_cur_chunk;
       }
