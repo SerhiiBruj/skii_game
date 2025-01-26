@@ -14,7 +14,7 @@ body {
     background-color: rgb(217, 217, 217);
   }
   * {
-
+    user-select: none;
     color: aliceblue;
     font-size: larger;
     font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
