@@ -3,7 +3,6 @@ body {
     flex-direction: column;
     display: flex;
     justify-content: center;
-    overflow:hidden;
     align-items: center;
   }
   .wrapper {
@@ -15,7 +14,7 @@ body {
     background-color: rgb(217, 217, 217);
   }
   * {
-
+    user-select: none;
     color: aliceblue;
     font-size: larger;
     font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
@@ -35,7 +34,6 @@ body {
     background-color: rgba(59, 47, 47, 0.277);
     display: none;
     display: flex;
-      overflow:hidden;
     justify-content: space-evenly;
     flex-direction: column;
     align-items: center;
@@ -47,7 +45,6 @@ body {
     position: absolute;
     bottom: 0px;
     height: 8vh;
-      overflow:hidden;
     width: 100vw;
     font-size: 40px;
     text-align: center;
