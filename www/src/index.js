@@ -235,6 +235,7 @@ async function run() {
     });
 
     function gameLoop() {
+      let player_y = game.get_player_y();
       const req_cur_chunk =game.get_current_chunk();
       if ( req_cur_chunk!== cur_cunk) {
         trees = game.get_all_trees_for_js(); 
@@ -246,7 +247,6 @@ async function run() {
         if (game.get_is_game_over()) {
           return;
         }
-        let player_y = game.get_player_y();
 
         ctx.fillStyle = "#95b1df";
         ctx.clearRect(0, 0, width, height);
