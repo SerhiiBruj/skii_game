@@ -1,10 +1,11 @@
 
-import init, { Game } from "rust";
+import init, { Game } from "../../rust/pkg/rust.js";
 
 const canvas = document.getElementById("gameCanvas");
 let wrapper = document.getElementById("wrapper")
 let gameOverSign = document.getElementById("gameOverSign")
-
+const scoreDisplay = document.getElementById("score");
+let distance;
 function resizeCanvas() {
   if (window.innerWidth < 450) {
     wrapper.style.width = "100vw";
@@ -12,24 +13,30 @@ function resizeCanvas() {
     canvas.height = window.innerHeight;
     wrapper.style.borderRadius=0; 
     document.body.style.overflowY="hidden";
+    scoreDisplay.style.top=0;
+    scoreDisplay.style.height="fit-content";
+    scoreDisplay.style.paddingTop="2vh";
+    scoreDisplay.style.fontSize="4vh";
+    distance=30;
+
   }
   else {
     wrapper.style.width = "fit-content";
     canvas.width = window.innerWidth * 0.5;
     canvas.height = window.innerHeight * 0.8;
-    console.log(canvas.width)
+    distance=0;
   }
 }
 resizeCanvas()
 const ctx = canvas.getContext("2d");
-const scoreDisplay = document.getElementById("score");
 const width = canvas.width;
 const height = canvas.height;
 const restartBtn = document.getElementById("restart");
-const img = new Image();
-const sideWayTree = new Image();
+
 const pressedKeys = new Set();
 const intervals = new Map();
+const img = new Image();
+const sideWayTree = new Image();
 sideWayTree.src = "./SideWayTree.png";
 img.src = "./tree.png";
 let images = [img, sideWayTree];
@@ -38,17 +45,29 @@ let cur_cunk = 1;
 
 
 let draw = (x, y) => {
-  ctx.drawImage(images[0], x-10, y + 10, 50, 110);
-
+  ctx.drawImage(images[0], x-6, y + 10+ distance, 50, 110);
 };
 let drawSideWayTree = (x, y) => {
-  ctx.drawImage(images[1], x - 45, y - 108, 100, 250);
-
+  ctx.drawImage(images[1], x - 45, y - 108+distance, 100, 250);
 };
 
 let distance_between_skiis_x;
 let distance_between_skiis_y;
 let x_offset_of_ligtning;
+function drawBody( x, y, width, height, radius) {
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y); // Початок зверху зліва (з урахуванням радіуса)
+  ctx.lineTo(x + width - radius, y); // Верхня сторона
+  ctx.quadraticCurveTo(x + width, y, x + width, y + radius); // Правий верхній кут
+  ctx.lineTo(x + width, y + height - radius); // Права сторона
+  ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height); // Правий нижній кут
+  ctx.lineTo(x + radius, y + height); // Нижня сторона
+  ctx.quadraticCurveTo(x, y + height, x, y + height - radius); // Лівий нижній кут
+  ctx.lineTo(x, y + radius); // Ліва сторона
+  ctx.quadraticCurveTo(x, y, x + radius, y); // Лівий верхній кут
+  ctx.closePath();
+  ctx.fill();
+}
 function drawSkier(ctx, x, y, rotation) {
   const radians = (rotation + 90) * -1 * (Math.PI / 180);
   distance_between_skiis_x = (90 - Math.abs(rotation)) / 6
@@ -59,20 +78,21 @@ function drawSkier(ctx, x, y, rotation) {
   ctx.save();
   ctx.rotate(radians);
   ctx.fillStyle = "black";
-
-  ctx.fillRect(-35 + distance_between_skiis_y , 2, 30, 4);
-  ctx.fillRect(-35 + distance_between_skiis_y * -1, distance_between_skiis_x, 30, 4);
+  let additionalOffset=rotation<0?  rotation/-3.5:0;
+  ctx.fillRect(-35 + distance_between_skiis_y + additionalOffset, 2, 30, 4);
+  ctx.fillRect(-35 + distance_between_skiis_y * -1+ additionalOffset, distance_between_skiis_x, 30, 4);
   ctx.restore();
   // Малюємо тулуб
   ctx.fillStyle = "#b3030f";
-  ctx.fillRect(0, -5, 20, 25);
+  
+  drawBody(0, -5, 20, 25,10);
 
   ctx.fillStyle = "#f5f0ec";
   ctx.fillRect(x_offset_of_ligtning, -5, 2, 22);
 
   ctx.beginPath();
-  ctx.fillStyle = "#d8cf89"; // Колір повного кола
-  ctx.arc(10, -10, 10, 0, Math.PI * 2, true); // Повне коло (360°)
+  ctx.fillStyle = "#d8cf89"; 
+  ctx.arc(10 , -10, 10, 0, Math.PI * 2, true);
   ctx.fill();
   ctx.closePath();
   ctx.beginPath();
@@ -92,29 +112,22 @@ function drawSkier(ctx, x, y, rotation) {
 
 }
 function drawtrees(trees, player_y) {
-  let regularTrees = [];
-  let sideWayTrees = [];
   trees.sort((a, b) => a.y - b.y).forEach((tree) => {
     if (tree.x > width * 0.2 && tree.x < width * 0.8) {
-      regularTrees.push(tree);
-    } else {
-      sideWayTrees.push(tree);
-    }
-  });
-  regularTrees.forEach((tree) => {
     draw(tree.x, tree.y - player_y + 10);
-  });
-  sideWayTrees.forEach((tree) => {
+    } else {
     drawSideWayTree(tree.x, tree.y - player_y + 10);
+    }
   });
 }
 
+const shadowDistance= 110 + distance;
 function drawShadow(trees, player_y) {
   trees.forEach((tree) => {
     if (tree.x > width * 0.2 && tree.x < width * 0.8)
-      ctx.fillRect(tree.x - 8, tree.y - player_y + 110, 45, 60);
+      ctx.fillRect(tree.x - 8, tree.y - player_y + shadowDistance, 45, 60);
     else {
-      ctx.fillRect(tree.x - 20, tree.y - player_y + 120, 70, 150);
+      ctx.fillRect(tree.x - 20, tree.y - player_y + shadowDistance, 70, 150);
     }
   });
 }
@@ -242,8 +255,8 @@ async function run() {
     function gameLoop() {
       let player_y = game.get_player_y();
       const req_cur_chunk =game.get_current_chunk();
-      if ( req_cur_chunk!== cur_cunk && player_y % height> height*0.5) {
-        trees = game.get_all_trees_for_js(); 
+      if ( req_cur_chunk!== cur_cunk  && player_y % height> height*0.5) {
+        trees = game.get_all_trees_for_js();
         cur_cunk=req_cur_chunk;
       }
 
