@@ -24,26 +24,26 @@ pub struct Game {
     tree_spawn_per_chunk:u8,
     trees_chunk1: Vec<(f64, f64)>,
     trees_chunk2: Vec<(f64, f64)>,
-    trees_chunk3: Vec<(f64, f64)>,
+    trees_chunk0: Vec<(f64, f64)>,
     current_chunk:u8,
 }
 
 
 #[wasm_bindgen]
 impl Game {
-    pub fn new(height: f64, width: f64, tree_spawn_per_chunk: u8) -> Game {
+    pub fn new(p_height: f64, width: f64, tree_spawn_per_chunk: u8) -> Game {
         Game {
             player_x: width / 2.0,
             player_y: 0.0,
             acceleration: 0.0,
             rotation: 0,
             width,
-            height,
+            height:p_height,
             traces: vec![],
+            trees_chunk0: vec![],
             trees_chunk1: vec![],
             trees_chunk2: vec![],
-            trees_chunk3: vec![],
-            current_chunk:1,
+            current_chunk:2,
             game_over: false,
             tree_spawn_per_chunk,
         }
@@ -55,8 +55,8 @@ impl Game {
         self.acceleration = 0.0;
         self.trees_chunk1= vec![];
         self.trees_chunk2= vec![];
-        self.trees_chunk3= vec![];
-        self.current_chunk=1;
+        self.trees_chunk0= vec![];
+        self.current_chunk=2;
         self.game_over= false;
         self.rotation=0;
         self.traces= vec![];
@@ -90,10 +90,10 @@ impl Game {
         }
     
         // Оновлюємо відповідний чанк
-        match (num_of_current_chunk + 1 )%3 {
-            0 => self.trees_chunk1 = chunk_trees,
-            1 => self.trees_chunk2 = chunk_trees,
-            2 => self.trees_chunk3 = chunk_trees,
+        match (self.current_chunk + 2 )%3 {
+            0 => self.trees_chunk0 = chunk_trees,
+            1 => self.trees_chunk1 = chunk_trees,
+            2 => self.trees_chunk2 = chunk_trees,
             _ => {}
         }
     }
@@ -126,7 +126,7 @@ impl Game {
         
         all_trees.extend_from_slice(&self.trees_chunk1);
         all_trees.extend_from_slice(&self.trees_chunk2);
-        all_trees.extend_from_slice(&self.trees_chunk3);
+        all_trees.extend_from_slice(&self.trees_chunk0);
 
         all_trees
     }
@@ -134,8 +134,8 @@ impl Game {
     
     pub fn update(&mut self) {
         let num_of_current_chunk = (self.player_y /self.height) as u8; 
-        let cur_chunk_being_rendered =num_of_current_chunk % 3;
-        if self.current_chunk != cur_chunk_being_rendered {
+        let cur_chunk_being_rendered = num_of_current_chunk % 3;
+        if self.current_chunk != cur_chunk_being_rendered   {
             self.generate_chunk(num_of_current_chunk); 
             self.current_chunk = cur_chunk_being_rendered;
         }
@@ -148,27 +148,44 @@ impl Game {
     pub fn get_all_trees_for_js(&self) -> JsValue {
         let all_trees = Array::new();
     
+        const include_chunk0:bool =true;
+        const include_chunk1:bool =true;
+        const include_chunk2:bool =true;
+
+        // let include_chunk0 = self.current_chunk == 0 || self.current_chunk == 1;
+        // let include_chunk1 = self.current_chunk == 1 || self.current_chunk == 2;
+        // let include_chunk2 = self.current_chunk == 2 || self.current_chunk == 0;
+
     
+    
+        if include_chunk0 {
+            for tree in &self.trees_chunk0 {
+                let tree_obj = Object::new();
+                Reflect::set(&tree_obj, &"x".into(), &JsValue::from_f64(tree.0)).unwrap();
+                Reflect::set(&tree_obj, &"y".into(), &JsValue::from_f64(tree.1)).unwrap();
+                all_trees.push(&tree_obj);
+            }
+        }
+
+        if include_chunk1 {
             for tree in &self.trees_chunk1 {
                 let tree_obj = Object::new();
                 Reflect::set(&tree_obj, &"x".into(), &JsValue::from_f64(tree.0)).unwrap();
                 Reflect::set(&tree_obj, &"y".into(), &JsValue::from_f64(tree.1)).unwrap();
                 all_trees.push(&tree_obj);
             }
+        }
     
+        if include_chunk2 {
             for tree in &self.trees_chunk2 {
                 let tree_obj = Object::new();
                 Reflect::set(&tree_obj, &"x".into(), &JsValue::from_f64(tree.0)).unwrap();
                 Reflect::set(&tree_obj, &"y".into(), &JsValue::from_f64(tree.1)).unwrap();
                 all_trees.push(&tree_obj);
             }
+        }
     
-            for tree in &self.trees_chunk3 {
-                let tree_obj = Object::new();
-                Reflect::set(&tree_obj, &"x".into(), &JsValue::from_f64(tree.0)).unwrap();
-                Reflect::set(&tree_obj, &"y".into(), &JsValue::from_f64(tree.1)).unwrap();
-                all_trees.push(&tree_obj);
-            }
+
     
         all_trees.into()
     }
