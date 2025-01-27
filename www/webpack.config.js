@@ -29,11 +29,11 @@ export default {
             },
             {
                 test: /\.css$/,
-                use: ["style-loader", "css-loader"],
+                use: "asset",
             },
             {
                 test: /\.(png|jpe?g|gif|svg)$/,
-                type: "asset/resource",
+                type: "asset",
             },
         ],
     },
