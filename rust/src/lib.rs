@@ -69,7 +69,7 @@ impl Game {
         let y_start = ((num_of_current_chunk + 2) as f64) * self.height;
         let y_end = y_start + self.height as f64;
     
-        self.traces.retain(|trace| trace.1 < self.player_y - 200.0);
+        self.traces.retain(|trace| trace.1 < self.player_y - self.height*0.3);
     
         // Генеруємо дерева в межах поточного чанка
         for _ in 0..self.tree_spawn_per_chunk {
@@ -89,7 +89,6 @@ impl Game {
             chunk_trees.push((x_right, y_right)); 
         }
     
-        // Оновлюємо відповідний чанк
         match (self.current_chunk + 2 )%3 {
             0 => self.trees_chunk0 = chunk_trees,
             1 => self.trees_chunk1 = chunk_trees,
@@ -98,10 +97,9 @@ impl Game {
         }
     }
 
-
     pub fn change_player_rotation(&mut self, rotation_degree: i8) {
         self.rotation = rotation_degree;
-        self.acceleration = (90 - self.rotation.abs()) as f64 ;
+        self.acceleration = (90 - self.rotation.abs()) as f64;
     }
 
     pub fn btn_change_rotation(&mut self, amount: i8) {
@@ -114,7 +112,7 @@ impl Game {
     
     fn move_player(&mut self) {
         self.acceleration *= 1.001;
-        self.player_y += (self.acceleration as f64)/15.0;
+        self.player_y += (self.acceleration as f64)/15.0 + self.player_y/30000.0;
         self.player_x += (self.rotation  as f64)/10 as f64;
         self.game_over = self.check_collision();
     }
