@@ -5,6 +5,7 @@ const canvas = document.getElementById("gameCanvas");
 let wrapper = document.getElementById("wrapper")
 let gameOverSign = document.getElementById("gameOverSign")
 const scoreDisplay = document.getElementById("score");
+let bestResult = Number(localStorage.getItem("bestResult"))
 let distance;
 if (window.innerWidth < 500) {
   canvas.width = window.innerWidth;
@@ -15,6 +16,9 @@ if (window.innerWidth < 500) {
   canvas.height = window.innerHeight * 0.8;
   distance = 0;
 }
+
+document.getElementById("bestScore").innerHTML= bestResult?`Best score: `+ bestResult:"";
+
 const ctx = canvas.getContext("2d");
 const width = canvas.width;
 const height = canvas.height;
@@ -22,20 +26,24 @@ const restartBtn = document.getElementById("restart");
 
 const pressedKeys = new Set();
 const intervals = new Map();
-const img = new Image();
+
+
+const tree = new Image();
 const sideWayTree = new Image();
-sideWayTree.src = "./SideWayTree.png";
-img.src = "./tree.png";
-let images = [img, sideWayTree];
+sideWayTree.src = "./testSideWayTreeImage.png";
+tree.src = "./finalTree.png";
+let images = [tree, sideWayTree];
 let game;
 let cur_cunk = 1;
 
 
+
+
 let draw = (x, y) => {
-  ctx.drawImage(images[0], x - 12, y + 10 + distance, 50, 110);
+  ctx.drawImage(images[0], x - 20, y -5+ distance, 60, 130);
 };
 let drawSideWayTree = (x, y) => {
-  ctx.drawImage(images[1], x - 45, y - 120 + distance, 100, 250);
+  ctx.drawImage(images[1], x - 25, y - 140 + distance, 80, 250);
 };
 
 let distance_between_skiis_x;
@@ -100,11 +108,11 @@ function drawSkier(ctx, x, y, rotation) {
 }
 function drawtrees(trees, player_y) {
   trees.sort((a, b) => a.y - b.y).forEach((tree) => {
-    if (tree.x > width * 0.2 && tree.x < width * 0.8) {
-      draw(tree.x, tree.y - player_y + 10);
-    } else {
-      drawSideWayTree(tree.x, tree.y - player_y + 10);
-    }
+    const tree_y_minus_player_y= tree.y-player_y ;
+      if (tree.x > width * 0.2 && tree.x < width * 0.8)
+        draw(tree.x, tree_y_minus_player_y + 10);
+      else
+        drawSideWayTree(tree.x, tree_y_minus_player_y + 10);
   });
 }
 
@@ -242,25 +250,32 @@ async function run() {
     function gameLoop() {
       let player_y = game.get_player_y();
       const req_cur_chunk = game.get_current_chunk();
-      if (req_cur_chunk !== cur_cunk && player_y % height > height * 0.5) {
+      if (req_cur_chunk !== cur_cunk && player_y % height > height * 0.8) {
         trees = game.get_all_trees_for_js();
         cur_cunk = req_cur_chunk;
+       
       }
+      const treesToRender= trees.filter(tree=>tree.y>player_y-height*0.5&&tree.y<player_y+height*1.5)
 
       try {
         game.update();
         if (game.get_is_game_over()) {
           gameOverSign.style.display = "flex";
+          if(bestResult < player_y){
+            bestResult=Math.floor(player_y);
+            localStorage.setItem("bestResult",String(Math.floor(player_y)))
+            document.getElementById("bestScore").innerHTML= `Best score: `+ bestResult;
+          }
           return;
         }
 
         ctx.fillStyle = "#95b1df";
         ctx.clearRect(0, 0, width, height);
-        drawShadow(trees, player_y)
+        drawShadow(treesToRender, player_y)
         drawTraces(player_y);
 
         drawSkier(ctx, game.get_player_x(), height * 0.2, game.get_player_rotation());
-        drawtrees(trees, player_y)
+        drawtrees(treesToRender, player_y)
 
         scoreDisplay.textContent =
           "Score: " + Math.floor(game.get_player_y());

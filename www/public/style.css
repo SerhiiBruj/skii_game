@@ -66,7 +66,16 @@ body {
   text-align: center;
   color: rgb(207, 207, 207);
 }
-
+#bestScore{
+  position: absolute;
+  bottom: 50px;
+  right: 5vw;
+  height: 5vh;
+  width: fit-content;
+  font-size: 30px;
+  text-align:center;
+  color: rgb(207, 207, 207);
+}
 canvas {
   width: 50vw;
   height: 80vh;
@@ -99,6 +108,19 @@ canvas {
     height: fit-content;
     padding-top: 2vh;
     font-size: 4vh;
+  }
+  #bestScore{
+    top: 0;
+    height: fit-content;
+    padding-top: 0.1vh;
+    font-size: 4vh;
+    position: absolute;
+    font-size: 3vh;
+    width: 30%;
+    right: none;
+    left: 0px;
+    bottom: none;
+    color: rgb(0, 0, 0);
   }
 
   canvas {
